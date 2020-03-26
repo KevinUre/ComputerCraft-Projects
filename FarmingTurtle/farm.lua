@@ -7,7 +7,7 @@ function patientForward()
         if success == true then
             return true
         else -- why couldnt we move?
-            if turtle.inspect() then
+            if turtle.inspect() == true then
                 return false --blocks wont move out of the way eventually
             else
                 sleep(0.05) -- its a mob, lets wait and try again
