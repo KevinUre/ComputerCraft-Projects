@@ -1,12 +1,27 @@
 waittime = 5
 minFuel = 25
 
+function patientForward()
+    while true do
+        local success, status = turtle.forward()
+        if success == true then
+            return true
+        else -- why couldnt we move?
+            if turtle.inspect() then
+                return false --blocks wont move out of the way eventually
+            else
+                sleep(0.05) -- its a mob, lets wait and try again
+            end
+        end
+    end
+end
+
 function CalibrateFromAboveChest(tries)
     if tries > 1 then
         printf("I'm lost! Shutting down...")
         exit()
     end
-    local moved = turtle.forward()
+    local moved = patientForward()
     if moved == true then
         local success, info = turtle.inspectDown()
         if success == true then
@@ -40,12 +55,12 @@ function CalibrateFromCrops()
         if success == true then
             if info["name"] == "minecraft:chest" then
                 turtle.turnLeft()
-                turtle.forward()
+                patientForward()
                 turtle.turnLeft()
                 return
             end
         end
-        turtle.forward()
+        patientForward()
         tries = tries + 1
     end
     printf("I'm lost! Shutting down...")
@@ -151,13 +166,13 @@ end
 function doALine()
     manageFuel()
     for i=1,7 do
-        turtle.forward()
+        patientForward()
         doFarming()
     end
-    turtle.forward()
+    patientForward()
     dropoff()
     turtle.turnLeft()
-    turtle.forward()
+    patientForward()
     turtle.turnLeft()
 end
 
