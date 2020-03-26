@@ -19,6 +19,7 @@ function CalibrateFromAboveChest(tries)
                 turtle.back() --we were already good, go back
                 return true
             end
+            -- #BUG# if we were above the correct spot, but it got trampled, we will be lost
         end
         -- the easy cases weren't it, so we wandered away from the farm: go back, turn, and try again
         turtle.back()
