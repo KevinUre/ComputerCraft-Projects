@@ -1,6 +1,7 @@
 waittime = 5
 minFuel = 25
 lineLength = 6
+print("Farming Turtle v1.1")
 
 function patientForward()
     while true do
