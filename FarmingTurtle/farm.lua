@@ -1,5 +1,6 @@
 waittime = 5
 minFuel = 25
+lineLength = 6
 
 function patientForward()
     while true do
@@ -166,21 +167,24 @@ end
 
 function doALine()
     manageFuel()
-    for i=1,7 do
+    for i=1,lineLength do
         patientForward()
         doFarming()
+        sleep(0)
     end
     patientForward()
     dropoff()
     turtle.turnLeft()
     patientForward()
     turtle.turnLeft()
+    sleep(0)
 end
 
 function mainFunction()
     BeginCalibration()
     while true do
         doALine()
+        sleep(0)
     end
 end
 
