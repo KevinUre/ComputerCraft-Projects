@@ -5,10 +5,10 @@
 const messageSample = {
     Name = 'CP1',
     Data = 'OK', // 100% etc
-    ExpiresAt = 1234, // in CC time, set by sender. null if never seen
+    SentAt = 1234, // in CC time, set by sender. null if never seen
+    ExpiresIn = 5, // in CC time, set by sender. null if never seen
     Expired = false, //comes as true from the network
 }
-
 
 const MessageRegister: Array<Message>;
 
