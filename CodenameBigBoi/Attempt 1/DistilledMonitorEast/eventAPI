@@ -1,0 +1,23 @@
+-- EventAPI Version 1.0.0
+
+-- structure of a callback:
+-- {
+--      EventType = string,
+--      CallbackHandle = functionPointer,
+-- }
+-- callback functions should accept all 5 parameters of an event or use ... to cut the rest off
+--     i.e. RednetCallback(senderID, message, protocol, ...)
+-- insert into EventCallbacks with table.insert()
+
+EventCallbacks = {}
+
+function EventListener()
+    while true do
+        local event, p1, p2, p3, p4, p5 = os.pullEvent()
+        for _,info in ipairs(EventCallbacks) do
+            if event == info.EventType then
+                info.CallbackHandle(p1, p2, p3, p4, p5)
+            end
+        end
+    end
+end

@@ -1,0 +1,337 @@
+{
+  [ "0,1,1" ] = {
+    Tanks = {
+      {
+        Capacity = 16000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 0,
+    Position = {
+      Y = 1,
+      X = 0,
+      Z = 1,
+    },
+    RawName = "buildcraft.tank",
+    Name = "Tank",
+  },
+  [ "0,0,1" ] = {
+    Tanks = {
+      {
+        Capacity = 16000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 0,
+    Position = {
+      Y = 0,
+      X = 0,
+      Z = 1,
+    },
+    RawName = "buildcraft.tank",
+    Name = "Tank",
+  },
+  [ "0,-1,1" ] = {
+    Tanks = {
+      {
+        Capacity = 16000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 0,
+    Position = {
+      Y = -1,
+      X = 0,
+      Z = 1,
+    },
+    RawName = "buildcraft.tank",
+    Name = "Tank",
+  },
+  [ "-1,2,1" ] = {
+    Tanks = {
+      {
+        Capacity = 10000,
+        Viscosity = 1000,
+        Amount = 6949,
+        Temperature = 300,
+        Name = "ic2distilledwater",
+        Luminousity = 0,
+        PercentFull = 69.49,
+        IsGaseous = false,
+        RawName = "ic2.fluidDistilledWater",
+      },
+    },
+    DamageValue = 0,
+    Position = {
+      Y = 2,
+      X = -1,
+      Z = 1,
+    },
+    RawName = "ic2.steam generator",
+    Name = "Steam Generator",
+  },
+  [ "-1,2,-1" ] = {
+    Tanks = {
+      {
+        Capacity = 1000,
+        Viscosity = 1000,
+        Amount = 1000,
+        Temperature = 300,
+        Name = "ic2distilledwater",
+        Luminousity = 0,
+        PercentFull = 100,
+        IsGaseous = false,
+        RawName = "ic2.fluidDistilledWater",
+      },
+      {
+        Capacity = 21000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 1,
+    Position = {
+      Y = 2,
+      X = -1,
+      Z = -1,
+    },
+    RawName = "ic2.kinetic steam generator",
+    Name = "Kinetic Steam Generator",
+  },
+  [ "-1,1,2" ] = {
+    Tanks = {
+      {
+        Capacity = 10000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+      {
+        Capacity = 10000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 0,
+    Position = {
+      Y = 1,
+      X = -1,
+      Z = 2,
+    },
+    RawName = "ic2.reactor fluid port",
+    Name = "Reactor Fluid Port",
+  },
+  [ "1,2,-1" ] = {
+    Tanks = {
+      {
+        Capacity = 1000,
+        Viscosity = 1000,
+        Amount = 1000,
+        Temperature = 300,
+        Name = "ic2distilledwater",
+        Luminousity = 0,
+        PercentFull = 100,
+        IsGaseous = false,
+        RawName = "ic2.fluidDistilledWater",
+      },
+      {
+        Capacity = 21000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 1,
+    Position = {
+      Y = 2,
+      X = 1,
+      Z = -1,
+    },
+    RawName = "ic2.kinetic steam generator",
+    Name = "Kinetic Steam Generator",
+  },
+  [ "1,2,-2" ] = {
+    Tanks = {
+      {
+        Capacity = 100000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+      {
+        Capacity = 1000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 15,
+    Position = {
+      Y = 2,
+      X = 1,
+      Z = -2,
+    },
+    RawName = "ic2.condenser",
+    Name = "Condenser",
+  },
+  [ "1,1,1" ] = {
+    Tanks = {
+      {
+        Capacity = 2000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+      {
+        Capacity = 2000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 12,
+    Position = {
+      Y = 1,
+      X = 1,
+      Z = 1,
+    },
+    RawName = "ic2.liquid heat exchanger",
+    Name = "Liquid Heat Exchanger",
+  },
+  [ "1,2,0" ] = {
+    Tanks = {
+      {
+        Capacity = 1000,
+        Viscosity = 1000,
+        Amount = 1,
+        Temperature = 300,
+        Name = "ic2distilledwater",
+        Luminousity = 0,
+        PercentFull = 0.1,
+        IsGaseous = false,
+        RawName = "ic2.fluidDistilledWater",
+      },
+      {
+        Capacity = 21000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 1,
+    Position = {
+      Y = 2,
+      X = 1,
+      Z = 0,
+    },
+    RawName = "ic2.kinetic steam generator",
+    Name = "Kinetic Steam Generator",
+  },
+  [ "1,2,1" ] = {
+    Tanks = {
+      {
+        Capacity = 10000,
+        Viscosity = 1000,
+        Amount = 5176,
+        Temperature = 300,
+        Name = "ic2distilledwater",
+        Luminousity = 0,
+        PercentFull = 51.76,
+        IsGaseous = false,
+        RawName = "ic2.fluidDistilledWater",
+      },
+    },
+    DamageValue = 0,
+    Position = {
+      Y = 2,
+      X = 1,
+      Z = 1,
+    },
+    RawName = "ic2.steam generator",
+    Name = "Steam Generator",
+  },
+  [ "-1,2,-2" ] = {
+    Tanks = {
+      {
+        Capacity = 100000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+      {
+        Capacity = 1000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 15,
+    Position = {
+      Y = 2,
+      X = -1,
+      Z = -2,
+    },
+    RawName = "ic2.condenser",
+    Name = "Condenser",
+  },
+  [ "-1,1,1" ] = {
+    Tanks = {
+      {
+        Capacity = 2000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+      {
+        Capacity = 2000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 12,
+    Position = {
+      Y = 1,
+      X = -1,
+      Z = 1,
+    },
+    RawName = "ic2.liquid heat exchanger",
+    Name = "Liquid Heat Exchanger",
+  },
+  [ "-1,2,0" ] = {
+    Tanks = {
+      {
+        Capacity = 1000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+      {
+        Capacity = 21000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 1,
+    Position = {
+      Y = 2,
+      X = -1,
+      Z = 0,
+    },
+    RawName = "ic2.kinetic steam generator",
+    Name = "Kinetic Steam Generator",
+  },
+  [ "1,1,2" ] = {
+    Tanks = {
+      {
+        Capacity = 10000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+      {
+        Capacity = 10000,
+        PercentFull = 0,
+        Amount = 0,
+      },
+    },
+    DamageValue = 0,
+    Position = {
+      Y = 1,
+      X = 1,
+      Z = 2,
+    },
+    RawName = "ic2.reactor fluid port",
+    Name = "Reactor Fluid Port",
+  },
+}

@@ -1,0 +1,55 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("left")
+messageAPI.RegisterAsProtocolHost(messageAPI.MessagingProtocols.Refueling, "Refueling")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("right")
+
+function Loop()
+    while true do
+        local details = scanner.getTargetDetails("1,-1,0")
+        local count = 0
+        for _, slot in pairs(details.Slots) do
+            if slot.Name == "Quad Fuel Rod (Depleted Uranium)" then
+                count = count + 1
+            end
+        end
+        if count > 0 then
+            local replacing = "???"
+            if messageAPI.IncomingMessageRegister["REFR"] ~= nil then
+                replacing = messageAPI.IncomingMessageRegister["REFR"].Data
+            end
+            if replacing == "???" then
+                redstone.setOutput("back", false)
+                messageAPI.SendMessage("RFUL", "ERR", 
+                    messageAPI.MessagingProtocols.Reactor, 
+                    messageAPI.MessagingProtocols.Monitor, 
+                    messageAPI.MessagingProtocols.Replating)
+            elseif replacing == "ACT" then
+                redstone.setOutput("back", false)
+                messageAPI.SendMessage("RFUL", "QUE",  
+                    messageAPI.MessagingProtocols.Reactor, 
+                    messageAPI.MessagingProtocols.Monitor, 
+                    messageAPI.MessagingProtocols.Replating)
+            else
+                redstone.setOutput("back", true)
+                messageAPI.SendMessage("RFUL", "ACT",  
+                    messageAPI.MessagingProtocols.Reactor, 
+                    messageAPI.MessagingProtocols.Monitor, 
+                    messageAPI.MessagingProtocols.Replating)
+            end
+        else
+            redstone.setOutput("back", false)
+            messageAPI.SendMessage("RFUL", "INA",  
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor, 
+                messageAPI.MessagingProtocols.Replating)
+        end
+        sleep(1)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

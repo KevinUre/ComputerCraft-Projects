@@ -1,0 +1,3 @@
+shell.run('ctrl')
+print("powering off")
+redstone.setOutput("bottom",false)

@@ -1,0 +1,35 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("left")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("right")
+
+function Loop()
+    while true do
+        local details = scanner.getTargetDetails("-1,-1,0")
+        local health = "ERR"
+        for _, slot in pairs(details.Slots) do
+            if slot.Name == "Overclocked Heat Vent" then
+                local percentHealth = (9999 - slot.DamageValue) / 9999 * 100
+                health = math.floor(percentHealth)
+                break
+            end
+        end
+        messageAPI.SendMessage("HVIN", health, 
+            messageAPI.MessagingProtocols.Reactor, 
+            messageAPI.MessagingProtocols.Monitor)
+        local integrity = "ERR"
+        if details.ItemCount == 54 then
+            integrity = "OK "
+        end
+        messageAPI.SendMessage("RINT", integrity, 
+            messageAPI.MessagingProtocols.Reactor, 
+            messageAPI.MessagingProtocols.Monitor)
+        sleep(1)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

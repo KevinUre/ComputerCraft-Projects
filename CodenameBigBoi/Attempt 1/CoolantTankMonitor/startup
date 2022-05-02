@@ -1,0 +1,23 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("left")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("back")
+
+function Loop()
+    while true do
+        local details = scanner.getTargetDetails("-1,1,-1")
+        local fillPercent = math.floor(details.Tanks[1].PercentFull)
+        print(fillPercent)
+        messageAPI.SendMessage("AXCL", fillPercent, 
+            messageAPI.MessagingProtocols.Monitor, 
+            messageAPI.MessagingProtocols.Reactor, 
+            messageAPI.MessagingProtocols.CoolantPump)
+        sleep(5)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

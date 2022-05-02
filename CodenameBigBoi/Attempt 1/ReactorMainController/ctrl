@@ -1,0 +1,131 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("top")
+messageAPI.RegisterAsProtocolHost(messageAPI.MessagingProtocols.Reactor, "Reactor")
+messageAPI.RegisterAcknowledgementCallback()
+
+allMessages = {
+    "RINT", -- Reactor Integrity
+    "RCHT", -- Reactor Core Heat
+    "HVIN", -- Heat Vent Integrity
+    "REFR", -- Reflector Replacement
+    "RFUL", -- Refueling
+    "RCLC", -- Reactor Cold Coolant Levels
+    "RCLH", -- Reactor Hot Coolant Levels
+    "AXCL", -- Auxiliary Coolant Levels
+    "CRPS", -- Control Room Power Switch
+    "DISN", -- North Turbine Bank Distilled Water
+    "DISE", -- East Turbine Bank Distilled Water
+    "DISS", -- South Turbine Bank Distilled Water
+    "DISW", -- West Turbine Bank Distilled Water
+    "TBN1", -- North Turbine Bank Turbine 1
+    "TBN2", -- North Turbine Bank Turbine 2
+    "TBN3", -- North Turbine Bank Turbine 3
+    "TBN4", -- North Turbine Bank Turbine 4
+    "TBE1", -- East Turbine Bank Turbine 1
+    "TBE2", -- East Turbine Bank Turbine 2
+    "TBE3", -- East Turbine Bank Turbine 3
+    "TBE4", -- East Turbine Bank Turbine 4
+    "TBS1", -- South Turbine Bank Turbine 1
+    "TBS2", -- South Turbine Bank Turbine 2
+    "TBS3", -- South Turbine Bank Turbine 3
+    "TBS4", -- South Turbine Bank Turbine 4
+    "TBW1", -- West Turbine Bank Turbine 1
+    "TBW2", -- West Turbine Bank Turbine 2
+    "TBW3", -- West Turbine Bank Turbine 3
+    "TBW4" -- West Turbine Bank Turbine 4
+}
+
+turbines = {"TBN1", "TBN2", "TBN3", "TBN4", "TBE1", "TBE2", "TBE3", "TBE4", "TBS1", "TBS2", "TBS3", "TBS4", "TBW1", "TBW2", "TBW3", "TBW4" }
+distilledTanks = {"DISN", "DISE", "DISS", "DISW"}
+
+
+function consider()
+    -- is everybody online?
+    for _,name in ipairs(allMessages) do
+        if messageAPI.IncomingMessageRegister[name] == nil then
+            return false, "missing communication from " .. name
+        end
+    end
+
+    -- emergency lever
+    if redstone.getInput("front") == false then
+        return false, "emergency level pulled"
+    end
+
+    -- Control Room Power Switch
+    if messageAPI.IncomingMessageRegister["CRPS"].Data == "OFF" then
+        return false, "control room signal power off"
+    end
+
+    -- Reactor Integrity
+    if messageAPI.IncomingMessageRegister["RINT"].Data == "ERR" then
+        return false, "reactor missing parts"
+    end
+
+    -- Reactor Core Heat
+    if messageAPI.IncomingMessageRegister["RCHT"].Data >= 60 then
+        return false, "Reactor Core Needs Cooling"
+    end
+
+    -- Heat Vent Integrity
+    if messageAPI.IncomingMessageRegister["HVIN"].Data <= 25 then
+        return false, "Heat Vents Need Cooling"
+    end
+
+    -- Reflector Replacement
+    if messageAPI.IncomingMessageRegister["REFR"].Data == "ACT" then
+        return false, "reflector replacement in progress"
+    end
+
+    -- Refueling
+    if messageAPI.IncomingMessageRegister["RFUL"].Data == "ACT" then
+        return false, "refueling in progress"
+    end
+
+    -- Reactor Cold Coolant Levels
+    if messageAPI.IncomingMessageRegister["RCLC"].Data <= 20 then
+        return false, "insufficient coolant in core"
+    end
+
+    -- Reactor Hot Coolant Levels
+    if messageAPI.IncomingMessageRegister["RCLH"].Data >= 60 then
+        return false, "hot coolant build-up in core"
+    end
+
+    -- Turbines
+    for _,turbine in ipairs(turbines) do
+        if messageAPI.IncomingMessageRegister[turbine].Data == "MIS" then
+            return false, "need replacement turbine: " .. turbine.Name
+        end
+    end
+
+    -- Distilled Water Levels
+    for _,tank in ipairs(distilledTanks) do
+        if messageAPI.IncomingMessageRegister[tank].Data < 0.1 then
+            return false, "insufficient water in loop: " .. tank.Name
+        end
+    end
+
+    return true, "reactor active"
+end
+
+function Loop()
+    while true do
+        local power, status = consider();
+        print(status)
+        if power then
+            redstone.setOutput("bottom",true)
+            messageAPI.SendMessage("RPWR", "ON ", messageAPI.MessagingProtocols.Monitor)
+            messageAPI.SendMessage("STAT", status, messageAPI.MessagingProtocols.Monitor)
+        else
+            redstone.setOutput("bottom",false)
+            messageAPI.SendMessage("RPWR", "OFF", messageAPI.MessagingProtocols.Monitor)
+            messageAPI.SendMessage("STAT", status, messageAPI.MessagingProtocols.Monitor)
+        end
+        sleep(1)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

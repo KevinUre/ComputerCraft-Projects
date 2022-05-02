@@ -1,0 +1,48 @@
+            11111111111222222222233333333344444444445
+   12345678901234567890123456789012345678901234567890
+  +--------------------------------------------------+
+ 1|   STATUS: need replacement turbine: DIST         |
+ 2|                                                  |
+ 3|   RPWR XXX    IPWR  85    GATE OPN    GRID 100   |
+ 4|                                                  |
+ 5|   RCHT XXX    HVIN XXX    REFR XXX    RFUL XXX   |
+ 6|                                                  |
+ 7|   RINT XXX    RCLC XXX    RCLH XXX    AXCL XXX   |
+ 8|                                                  |
+ 9|    NORTH        EAST       SOUTH        WEST     |
+10|   --------    --------    --------    --------   |
+11|   TBN1 XXX    TBE1 XXX    TBS1 XXX    TBW1 XXX   |
+12|                                                  |
+13|   TBN2 XXX    TBE2 XXX    TBS2 XXX    TBW2 XXX   |
+14|                                                  |
+15|   TBN3 XXX    TBE3 XXX    TBS3 XXX    TBW3 XXX   |
+16|                                                  |
+17|   TBN4 XXX    TBE4 XXX    TBS4 XXX    TBW4 XXX   |
+18|                                                  |
+19|   DISN XXX    DISE XXX    DISS XXX    DISW XXX   |
+  +--------------------------------------------------+
+
+
+            11111111111222222222233333333344444444445
+   12345678901234567890123456789012345678901234567890
+  +--------------------------------------------------+
+ 1|                                                  | |
+ 2|   STATUS: need replacement turbine: DIST         |
+ 3|                                                  |
+ 4|   RPWR XXX    IPWR  85    GATE OPN    GRID 100   |
+ 5|                                                  |
+ 6|   RCHT XXX    HVIN XXX    REFR XXX    RFUL XXX   |
+ 7|                                                  |
+ 8|   RINT XXX    RCLC XXX    RCLH XXX    AXCL XXX   |
+ 9|                                                  | |
+10|   TBN1 XXX    TBE1 XXX    TBS1 XXX    TBW1 XXX   |
+11|                                                  |
+12|   TBN2 XXX    TBE2 XXX    TBS2 XXX    TBW2 XXX   |
+13|                                                  |
+14|   TBN3 XXX    TBE3 XXX    TBS3 XXX    TBW3 XXX   |
+15|                                                  |
+16|   TBN4 XXX    TBE4 XXX    TBS4 XXX    TBW4 XXX   |
+17|                                                  |
+18|   DISN XXX    DISE XXX    DISS XXX    DISW XXX   |
+19|                                                  | |
+  +--------------------------------------------------+

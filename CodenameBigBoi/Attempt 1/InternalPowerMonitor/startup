@@ -1,0 +1,42 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("right")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("back")
+
+state = "charging"
+
+function Loop()
+    while true do
+        local details = scanner.getTargetDetails("0,0,-1")
+        local powerLevel = math.floor(details.StoredPercentage)
+        messageAPI.SendMessage("IPWR", powerLevel, messageAPI.MessagingProtocols.Monitor)
+
+        if state == "charging" then
+            if powerLevel > 85 then
+                redstone.setOutput("bottom",false) -- give to grid
+                state = "discharging"
+            end
+        else
+            if powerLevel < 50 then
+                redstone.setOutput("bottom",true) -- store internally
+                state = "charging"
+            end
+        end
+
+        --second if block so we sent the latest information
+        if state == "charging" then
+            messageAPI.SendMessage("GATE", "CLO", messageAPI.MessagingProtocols.Monitor)
+        else
+            messageAPI.SendMessage("GATE", "OPN", messageAPI.MessagingProtocols.Monitor)
+        end
+
+        messageAPI.SendMessage("GRID", 100, messageAPI.MessagingProtocols.Monitor) -- PLACEHOLDER FOR GTID PROXY
+        sleep(5)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

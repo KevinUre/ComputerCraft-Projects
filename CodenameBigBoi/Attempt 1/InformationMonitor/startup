@@ -1,0 +1,178 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("bottom")
+messageAPI.RegisterAsProtocolHost(messageAPI.MessagingProtocols.Monitor, "Monitor")
+
+monitor = peripheral.wrap("top")
+monitor.clear()
+monitor.setTextScale(1.0)
+
+function RegisterMessageListenerOverride(name, x, y)
+    messageAPI.MessageRegister[name] = {}
+    messageAPI.MessageRegister[name].Name = name
+    messageAPI.MessageRegister[name].Data = "???"
+    messageAPI.MessageRegister[name].SentAt = 0
+    messageAPI.MessageRegister[name].ExpiresIn = 0
+    messageAPI.MessageRegister[name].Expired = true
+    messageAPI.MessageRegister[name].Dirty = true
+    local drawPos = {}
+    drawPos.X = x
+    drawPos.Y = y
+    messageAPI.MessageRegister[name].DrawPos = drawPos
+end
+
+function ListenerOverride()
+    while true do
+        local senderId, message, protocol = rednet.receive(messageAPI.MessagingProtocol)
+        if messageAPI.MessageRegister[message.Name] ~= nil then
+            if messageAPI.MessageRegister[message.Name].Data ~= message.Data then
+                messageAPI.MessageRegister[message.Name].Dirty = true
+            end
+            messageAPI.MessageRegister[message.Name].Data = message.Data
+            messageAPI.MessageRegister[message.Name].SentAt = message.SentAt
+            messageAPI.MessageRegister[message.Name].ExpiresIn = message.ExpiresIn
+            messageAPI.MessageRegister[message.Name].Expired = false
+        end
+        sleep(0)
+    end
+end
+
+--
+RegisterMessageListenerOverride("STAT", 4, 1) -- Reactor Status
+
+RegisterMessageListenerOverride("RPWR", 4, 3) -- Reactor Power
+RegisterMessageListenerOverride("IPWR", 16, 3) -- Reactor Power
+RegisterMessageListenerOverride("GATE", 28, 3) -- Reactor Power
+RegisterMessageListenerOverride("GRID", 40, 3) -- Reactor Power
+
+RegisterMessageListenerOverride("RCHT", 4, 5) -- Reactor Core Heat
+RegisterMessageListenerOverride("HVIN", 16, 5) -- Heat Vent Integrity
+RegisterMessageListenerOverride("REFR", 28, 5) -- Reflector Replacement
+RegisterMessageListenerOverride("RFUL", 40, 5) -- Refueling
+
+RegisterMessageListenerOverride("RINT", 4, 7) -- Reactor Integrity
+RegisterMessageListenerOverride("RCLC", 16, 7) -- Reactor Cold Coolant Levels
+RegisterMessageListenerOverride("RCLH", 28, 7) -- Reactor Hot Coolant Levels
+RegisterMessageListenerOverride("AXCL", 40, 7) -- Auxiliary Coolant Levels
+
+-- Headers for north/south/east/west - init()
+
+RegisterMessageListenerOverride("TBN1", 4, 11) -- North Turbine Bank Turbine 1
+RegisterMessageListenerOverride("TBN2", 4, 13) -- North Turbine Bank Turbine 2
+RegisterMessageListenerOverride("TBN3", 4, 15) -- North Turbine Bank Turbine 3
+RegisterMessageListenerOverride("TBN4", 4, 17) -- North Turbine Bank Turbine 4
+RegisterMessageListenerOverride("DISN", 4, 19) -- North Turbine Bank Distilled Water
+
+RegisterMessageListenerOverride("TBE1", 16, 11) -- East Turbine Bank Turbine 1
+RegisterMessageListenerOverride("TBE2", 16, 13) -- East Turbine Bank Turbine 2
+RegisterMessageListenerOverride("TBE3", 16, 15) -- East Turbine Bank Turbine 3
+RegisterMessageListenerOverride("TBE4", 16, 17) -- East Turbine Bank Turbine 4
+RegisterMessageListenerOverride("DISE", 16, 19) -- East Turbine Bank Distilled Water
+
+RegisterMessageListenerOverride("TBS1", 28, 11) -- South Turbine Bank Turbine 1
+RegisterMessageListenerOverride("TBS2", 28, 13) -- South Turbine Bank Turbine 2
+RegisterMessageListenerOverride("TBS3", 28, 15) -- South Turbine Bank Turbine 3
+RegisterMessageListenerOverride("TBS4", 28, 17) -- South Turbine Bank Turbine 4
+RegisterMessageListenerOverride("DISS", 28, 19) -- South Turbine Bank Distilled Water
+
+RegisterMessageListenerOverride("TBW1", 40, 11) -- West Turbine Bank Turbine 1
+RegisterMessageListenerOverride("TBW2", 40, 13) -- West Turbine Bank Turbine 2
+RegisterMessageListenerOverride("TBW3", 40, 15) -- West Turbine Bank Turbine 3
+RegisterMessageListenerOverride("TBW4", 40, 17) -- West Turbine Bank Turbine 4
+RegisterMessageListenerOverride("DISW", 40, 19) -- West Turbine Bank Distilled Water
+--
+
+function Loop()
+    while true do
+        messageAPI.CheckRegisters()
+        for i, lastMessage in pairs(messageAPI.MessageRegister) do
+            if lastMessage.Dirty then
+                draw(lastMessage)
+                messageAPI.MessageRegister[i].Dirty = false
+            end
+        end
+        sleep(0.05)
+        -- draw reactor message
+    end
+end
+
+function kevinsStringFormat(data)
+    local dataAsString = tostring(data)
+    local length = string.len(dataAsString)
+    local returnMeDaddy = dataAsString
+    if length == 1 then
+        returnMeDaddy = "  " .. dataAsString
+    elseif length == 2 then
+        returnMeDaddy = " " .. dataAsString
+    end
+    return returnMeDaddy
+end
+
+function draw(message)
+    if message.Name == "STAT" then
+        drawStatus(message)
+        return
+    end
+
+    -- Set Label
+    monitor.setCursorPos(message.DrawPos.X, message.DrawPos.Y)
+    monitor.setTextColor(1)
+    monitor.setBackgroundColor(32768)
+    monitor.write(message.Name)
+
+    if message.Type == "header" then
+        return
+    end
+    -- Set Value
+    monitor.setCursorPos(message.DrawPos.X + 5, message.DrawPos.Y)
+    monitor.setTextColor(32768)
+    monitor.setBackgroundColor(256)
+    monitor.write(kevinsStringFormat(message.Data))
+
+    monitor.setTextColor(1)
+    monitor.setBackgroundColor(32768)
+end
+
+function drawStatus(message)
+    monitor.setCursorPos(message.DrawPos.X, message.DrawPos.Y)
+    monitor.setTextColor(1)
+    monitor.setBackgroundColor(32768)
+    monitor.write("STATUS: " .. message.Data)
+end
+
+function generateHeader(name, x, y)
+    local header = {}
+    header.Name = name
+    header.Type = "header"
+    local drawPos = {}
+    drawPos.X = x
+    drawPos.Y = y
+    header.DrawPos = drawPos
+
+    return header
+end
+
+function init()
+    local headers = {}
+
+    headers[1] = generateHeader("North", 5, 9)
+    headers[2] = generateHeader("East", 18, 9)
+    headers[3] = generateHeader("South", 29, 9)
+    headers[4] = generateHeader("West", 42, 9)
+
+    headers[5] = generateHeader("--------", 4, 10)
+    headers[6] = generateHeader("--------", 16, 10)
+    headers[7] = generateHeader("--------", 28, 10)
+    headers[8] = generateHeader("--------", 40, 10)
+
+    -- headers[9] = generateHeader("STATUS: need replacement turbine: DIST", 4, 1)
+
+    for i, header in pairs(headers) do
+        draw(header)
+    end
+end
+
+
+init()
+parallel.waitForAll(Loop, ListenerOverride);

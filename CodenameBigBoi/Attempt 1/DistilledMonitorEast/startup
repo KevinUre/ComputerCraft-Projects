@@ -1,0 +1,21 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("right")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("top")
+
+function Loop()
+    while true do
+        local details = scanner.getTargetDetails("-1,0,0")
+        local fillPercent = math.floor(details.Tanks[1].PercentFull)
+        messageAPI.SendMessage("DISE", fillPercent,  
+                messageAPI.MessagingProtocols.Monitor, 
+                messageAPI.MessagingProtocols.Reactor)
+        sleep(5)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

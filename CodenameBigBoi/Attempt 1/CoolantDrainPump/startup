@@ -1,0 +1,33 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("back")
+messageAPI.RegisterAsProtocolHost(messageAPI.MessagingProtocols.CoolantDrain, "CoolantDrain")
+messageAPI.RegisterAcknowledgementCallback()
+
+function Loop()
+    while true do
+        local currentCoolantLevels = "???"
+        if messageAPI.IncomingMessageRegister["RCLH"] ~= nil then
+            currentCoolantLevels = messageAPI.IncomingMessageRegister["RCLH"].Data
+        end
+        if currentCoolantLevels == "???" then
+            messageAPI.SendMessage("ECDP", "ERR", 
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        elseif currentCoolantLevels >= 0.5 then
+            redstone.setOutput("top",true)
+            messageAPI.SendMessage("ECDP", "ON ", 
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        else
+            redstone.setOutput("top",false)
+            messageAPI.SendMessage("ECDP", "OFF", 
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        end 
+        sleep(1)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

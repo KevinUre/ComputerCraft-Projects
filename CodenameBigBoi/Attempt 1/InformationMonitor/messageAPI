@@ -1,0 +1,99 @@
+-- MessageAPI Version 2.1.2
+    -- Requires EventAPI 1.0.0
+
+IncomingMessageRegister = {}
+OutgoingMessageRegister = {}
+ListenerProtocol = ""
+
+MessagingProtocols = {}
+MessagingProtocols.Monitor = "Monitor"
+MessagingProtocols.Reactor = "Reactor"
+MessagingProtocols.CoolantPump = "Pump"
+MessagingProtocols.CoolantDrain = "Drain"
+MessagingProtocols.Refueling = "Refuel"
+MessagingProtocols.Replating = "Plate"
+MessagingProtocols.Acknowledge = "ACK"
+
+ProtocolHostCache = {}
+
+function InitModem(side)
+    rednet.open(side);
+end
+
+---------------------------
+-- FOR RECEIVERS OF DATA --
+---------------------------
+
+function RegisterAsProtocolHost(protocolName, hostName)
+    rednet.host(protocolName, hostName)
+    ListenerProtocol = protocolName
+end
+
+function IncomingMessageProcessor(senderID, message, protocol, ...)
+    if protocol == ListenerProtocol then
+        IncomingMessageRegister[message.Name] = message
+        rednet.send(senderID,message.Name,MessagingProtocols.Acknowledge)
+    end
+end
+
+function RegisterIncomingMessageCallback()
+    local newCallback = {}
+    newCallback.EventType = "rednet_message"
+    newCallback.CallbackHandle = IncomingMessageProcessor
+    table.insert(eventAPI.EventCallbacks, newCallback)
+end
+
+-------------------------
+-- FOR SENDERS OF DATA --
+-------------------------
+
+function SendMessage(name, data, protocol, ...)
+    local receiverID = ProtocolHostCache[protocol]
+    local skipToNext = false;
+    if receiverID == nil then -- if not cached yet
+        local newID = rednet.lookup(protocol)
+        if newID == nil then -- if nobody is listening on that protocol
+            skipToNext = true
+        end
+        ProtocolHostCache[protocol] = newID -- cache receiver's ID for future use
+        receiverID = newID
+    end
+
+    local messageKey = nil
+    if skipToNext == false then
+        messageKey = name .. receiverID
+        -- if we've sent this before, the data hasn't changed, and its been acknowledged, skip it
+        if OutgoingMessageRegister[messageKey] ~= nil and OutgoingMessageRegister[messageKey].Data == data and OutgoingMessageRegister[messageKey].Acknowledged == true then
+            skipToNext = true
+        end
+    end
+    
+    if skipToNext == false then
+        local message = {}
+        message.Name = name
+        message.Data = data
+
+        OutgoingMessageRegister[messageKey] = {}
+        OutgoingMessageRegister[messageKey].Data = data
+        OutgoingMessageRegister[messageKey].Acknowledged = false
+
+        rednet.send(receiverID, message, protocol);
+    end
+
+    if arg.n > 0 then
+        SendMessage(name, data, unpack(arg))
+    end
+end
+
+function AcknowledgementCallback(senderID, message, protocol, ...)
+    if protocol == MessagingProtocols.Acknowledge then
+        OutgoingMessageRegister[message .. senderID].Acknowledged = true
+    end
+end
+
+function RegisterAcknowledgementCallback()
+    local newCallback = {}
+    newCallback.EventType = "rednet_message"
+    newCallback.CallbackHandle = AcknowledgementCallback
+    table.insert(eventAPI.EventCallbacks, newCallback)
+end

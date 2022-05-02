@@ -1,0 +1,33 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("back")
+messageAPI.RegisterAsProtocolHost(messageAPI.MessagingProtocols.CoolantPump, "CoolantPump")
+messageAPI.RegisterAcknowledgementCallback()
+
+function Loop()
+    while true do
+        local currentCoolantLevels = "???"
+        if messageAPI.IncomingMessageRegister["RCLC"] ~= nil then
+            currentCoolantLevels = messageAPI.IncomingMessageRegister["RCLC"].Data
+        end
+        if currentCoolantLevels == "???" then
+            messageAPI.SendMessage("AXCP", "ERR", 
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        elseif currentCoolantLevels <= 0.25 then
+            redstone.setOutput("top",true)
+            messageAPI.SendMessage("AXCP", "ON ", 
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        else
+            redstone.setOutput("top",false)
+            messageAPI.SendMessage("AXCP", "OFF", 
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        end 
+        sleep(1)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

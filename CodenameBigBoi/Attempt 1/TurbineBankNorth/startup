@@ -1,0 +1,31 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("top")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("front")
+
+function Loop()
+    while true do
+        local turbines = {"1,0,1", "1,0,0", "-1,0,0", "-1,0,1"}
+        for turbineKey, turbineLocation in ipairs(turbines) do
+            local details = scanner.getTargetDetails(turbineLocation)
+            local turbineHealth = "MIS"
+            for _, slot in pairs(details.Slots) do
+                if slot.Name == "Steam Turbine" then
+                    local percentHealth = (9999 - slot.DamageValue) / 9999 * 100
+                    turbineHealth = math.floor(percentHealth)
+                    break
+                end
+            end
+            messageAPI.SendMessage("TBN" .. tostring(turbineKey), turbineHealth, 
+                messageAPI.MessagingProtocols.Monitor, 
+                messageAPI.MessagingProtocols.Reactor)
+        end
+        sleep(5)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

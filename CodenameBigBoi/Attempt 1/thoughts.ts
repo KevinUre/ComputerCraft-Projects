@@ -1,3 +1,11 @@
+// can we use pipe gates to valve the emergency coolant?
+
+// can we bootload the main controller to recover from a fatal lua error?
+    //and still recover from ctrl+T obviously
+
+// need computers for refueling on/off and emergency coolant on/off still
+
+
 // can the OTA loader stop an app thats using the parallels API?
 // upgrade OTA loader to be able to replace messaging lib as well
     // upgrade OTA to be able to upgrade itself?!?

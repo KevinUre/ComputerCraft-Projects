@@ -1,0 +1,21 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("top")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("front")
+
+function Loop()
+    while true do
+        local details = scanner.getTargetDetails("-1,-3,0")
+        local heatPercent = math.floor(details.HeatPercentage)
+        messageAPI.SendMessage("RCHT", heatPercent, 
+            messageAPI.MessagingProtocols.Reactor, 
+            messageAPI.MessagingProtocols.Monitor)
+        sleep(1)
+    end
+end
+
+Loop()

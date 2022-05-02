@@ -1,0 +1,55 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("right")
+messageAPI.RegisterAsProtocolHost(messageAPI.MessagingProtocols.Replating, "Replating")
+messageAPI.RegisterAcknowledgementCallback()
+
+os.loadAPI("ocs/apis/sensor")
+local scanner = sensor.wrap("left")
+
+function Loop()
+    while true do
+        local details = scanner.getTargetDetails("1,-1,0")
+        local count = 0
+        for _, slot in pairs(details.Slots) do
+            if slot.Name == "Thick Neutron Reflector" then
+                count = count + 1
+            end
+        end
+        if count < 5 then
+            local refueling ="???"
+            if messageAPI.IncomingMessageRegister["RFUL"] ~= nil then
+                refueling = messageAPI.IncomingMessageRegister["RFUL"].Data
+            end
+            if refueling == "???" then
+                redstone.setOutput("back", false)
+                messageAPI.SendMessage("REFR", "ERR", 
+                    messageAPI.MessagingProtocols.Reactor, 
+                    messageAPI.MessagingProtocols.Monitor, 
+                    messageAPI.MessagingProtocols.Refueling)
+            elseif refueling == "ACT" then
+                redstone.setOutput("back", false)
+                messageAPI.SendMessage("REFR", "QUE", 
+                    messageAPI.MessagingProtocols.Reactor, 
+                    messageAPI.MessagingProtocols.Monitor, 
+                    messageAPI.MessagingProtocols.Refueling)
+            else
+                redstone.setOutput("back", true)
+                messageAPI.SendMessage("REFR", "ACT", 
+                    messageAPI.MessagingProtocols.Reactor, 
+                    messageAPI.MessagingProtocols.Monitor, 
+                    messageAPI.MessagingProtocols.Refueling)
+            end
+        else
+            redstone.setOutput("back", false)
+            messageAPI.SendMessage("REFR", "INA", 
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor, 
+                messageAPI.MessagingProtocols.Refueling)
+        end
+        sleep(1)
+    end
+end
+
+parallel.waitForAny(Loop, eventAPI.EventListener)

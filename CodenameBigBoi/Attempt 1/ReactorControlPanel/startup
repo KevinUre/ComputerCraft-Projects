@@ -1,0 +1,51 @@
+os.loadAPI("eventAPI")
+
+os.loadAPI("messageAPI")
+messageAPI.InitModem("back")
+messageAPI.RegisterAcknowledgementCallback()
+
+currentState = false
+
+function write(message)
+    term.clear()
+    term.setCursorPos(1,1)
+    print(message)
+end
+
+function Loop()
+    write("Reactor Offline")
+    while true do
+        if currentState then
+            messageAPI.SendMessage("CRPS", "ON ",  
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        else 
+            messageAPI.SendMessage("CRPS", "OFF",  
+                messageAPI.MessagingProtocols.Reactor, 
+                messageAPI.MessagingProtocols.Monitor)
+        end
+        sleep(1)
+    end
+end
+
+function KeyHandler()
+    if key == keys.enter then
+        if currentState then
+            write("Reactor Offline")
+            currentState = false
+        else 
+            write("Reactor Online")
+            currentState = true
+        end
+    end
+end
+
+function registerKeyCallback()
+    local newCallback = {}
+    newCallback.EventType = "key_up"
+    newCallback.CallbackHandle = KeyHandler
+    table.insert(eventAPI.EventCallbacks, newCallback)
+end
+
+registerKeyCallback()
+parallel.waitForAny(Loop, eventAPI.EventListener)
